@@ -1,0 +1,87 @@
+use MetroAlt
+
+select [EmployeeLastName]
+,[EmployeeFirstName]
+,[BusRouteKey]
+,[BusDriverShiftKey]
+,[BusScheduleAssignmentDate]
+,b.[BusKey]
+,[BusTypeDescription]
+,[Riders]
+From Employee e
+inner join BusScheduleAssignment bsa
+on e.EmployeeKey=bsa.EmployeeKey
+inner join Ridership r
+on r.BusScheduleAssigmentKey=bsa.BusScheduleAssignmentKey
+inner join Bus b
+on b.BusKey=bsa.BusKey
+inner join BusType bt
+on b.BusTypekey=bt.BusTypeKey
+where busrouteKey = 45
+and year(busScheduleAssignmentDate)=2014
+and month (busScheduleAssignmentDate)=6
+order by [BusScheduleAssignmentDate]
+,BusDriverShiftKey
+,EmployeeLastName
+
+Create nonclustered index ix_BusRouteKey on BusScheduleAssignment(BusRouteKey)
+INCLUDE(BusScheduleAssignmentKey, BusDriverShiftKey, EmployeeKey, BusScheduleAssignmentDate, BusKey)
+
+CREATE NONCLUSTERED INDEX [<Name of Missing Index, sysname,>]
+ON [dbo].[Ridership] ([BusScheduleAssigmentKey])
+INCLUDE ([Riders])
+
+--indexes
+
+--clustered index
+--each table can only have one; it is how the table is ordered, typically by primary key
+--Physical order of the table
+
+--non-clustered index B-tree
+--creates a root, branches, and leaves that contain the data; organizes data into branches so that it can be searched logically; pointers with c++
+
+Create nonclustered index ix_PersonLastName on Person(PersonLastName)
+
+Create unique index ix_PersonEmail on Person(PersonEmail)
+--unique email is treated as a key because it is unique, it becomes an alternate key
+
+--Filtered index below
+Create index ix_city on PersonAddress(PersonAddressCity)
+Where PersonAddressCity='Seattle'
+--index applies only to rows in the table that have Seattle
+
+--clustered indexes are applied to the primary key by default. you can specify a different value for the index
+
+Create table Test
+(
+	TestID int Identity(1,1),
+	TestDate dateTime default GetDate()
+)
+
+Create Clustered index ix_TestID on Test(TestID)
+
+--Complicated query
+use Community_Assist
+
+select PersonLastName, 
+PersonFirstName, 
+PersonEmail, 
+GrantTypeName, 
+GrantRequestDate,
+GrantTypeName,
+GrantRequestExplanation,
+GrantRequestAmount,
+GrantReviewDate,
+GrantRequestStatus,
+GrantAllocationAmount
+from Person p with(index(ix_PersonLastName))
+inner join GrantRequest gr
+on p.PersonKey=gr.PersonKey
+inner join GrantType gt
+on gr.GrantTypeKey=gt.GrantTypeKey
+inner join GrantReview grev
+on grev.GrantRequestKey=gr.GrantRequestKey
+Where GrantAllocationAmount < GrantRequestAmount
+OR GrantAllocationAmount is null
+
+--selecting EXECUTION PLAN while running will show %cost of all steps in the query and allow you to optimize
