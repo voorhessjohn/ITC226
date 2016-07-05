@@ -1,81 +1,28 @@
-use master
-if exists
-	(Select name from sys.Databases
-	Where name = 'Employeepartition')
-Begin
-Drop Database EmployeePartition
-End
-Go
-Create Database EmployeePartition
-Go
+USE [MetroAlt]
+GO
 
-Alter Database EmployeePartition
-Add Filegroup Employees1995Group
-Go 
-Alter Database EmployeePartition
-Add File
+/****** Object:  Table [dbo].[Employee]    Script Date: 7/5/2016 1:58:48 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Employee](
+	[EmployeeKey] [int] IDENTITY(1,1) NOT NULL,
+	[EmployeeLastName] [nvarchar](255) NOT NULL,
+	[EmployeeFirstName] [nvarchar](255) NULL,
+	[EmployeeAddress] [nvarchar](255) NOT NULL,
+	[EmployeeCity] [nvarchar](255) NOT NULL,
+	[EmployeeZipCode] [nchar](5) NOT NULL,
+	[EmployeePhone] [nchar](10) NULL,
+	[EmployeeEmail] [nvarchar](255) NOT NULL,
+	[EmployeeHireDate] [date] NOT NULL,
+PRIMARY KEY CLUSTERED 
 (
-	name='Employees1995',
-	filename='C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\Employees1995File.ndf',
-	maxsize=200mb,
-	FileGrowth=5mb
-	) to filegroup Employees1995Group
+	[EmployeeKey] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
 
-go
-Alter Database EmployeePartition
-Add Filegroup Employees2000Group
-Go 
-Alter Database EmployeePartition
-Add File
-(
-	name='Employees2000',
-	filename='C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\Employees2000File.ndf',
-	maxsize=200mb,
-	FileGrowth=5mb
-	) to filegroup Employees2000Group
+GO
 
-go
-Alter Database EmployeePartition
-Add Filegroup Employees2005Group
-Go 
-Alter Database EmployeePartition
-Add File
-(
-	name='Employees2005',
-	filename='C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\Employees2005File.ndf',
-	maxsize=200mb,
-	FileGrowth=5mb
-	) to filegroup Employees2005Group
-
-go
-Alter Database EmployeePartition
-Add Filegroup Employees2010Group
-Go 
-Alter Database EmployeePartition
-Add File
-(
-	name='Employees2010',
-	filename='C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\Employees2010File.ndf',
-	maxsize=200mb,
-	FileGrowth=5mb
-	) to filegroup Employees2010Group
-
-go
-Alter Database EmployeePartition
-Add Filegroup Employees2015Group
-Go 
-Alter Database EmployeePartition
-Add File
-(
-	name='Employees2015',
-	filename='C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\Employees2015File.ndf',
-	maxsize=200mb,
-	FileGrowth=5mb
-	) to filegroup Employees2015Group
-
---create partition function and partition schema
-use EmployeePartition
-
-Create partition function fx_HireDate(Date) --emplyee table tells us the data type (date, not datetime)
-As range left --outer leftmost date (range right would be the starting date) Range left is the termination date(?) The following would have worked better with RANGE RIGHT
-for values('19941231','19991231','20041231','20091231') --YOu have to have one less date in the values than in the partitions for overflow. 5 groups, 4 partitions
