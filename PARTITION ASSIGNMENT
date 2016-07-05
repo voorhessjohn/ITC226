@@ -1,0 +1,94 @@
+use master
+if exists
+	(Select name from sys.Databases
+	Where name = 'BusShiftpartition')
+Begin
+Drop Database BusShiftPartition
+End
+Go
+Create Database BusShiftPartition
+Go
+
+Alter Database BusShiftPartition
+Add Filegroup BusShift2012Group
+Go 
+Alter Database BusShiftPartition
+Add File
+(
+	name='BusShift2012',
+	filename='C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\BusShift2012File.ndf',
+	maxsize=200mb,
+	FileGrowth=5mb
+	) to filegroup BusShift2012Group
+
+Go 
+Alter Database BusShiftPartition
+Add Filegroup BusShift2013Group
+go
+Alter Database BusShiftPartition
+Add File
+(
+	name='BusShift2013',
+	filename='C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\BusShift2013File.ndf',
+	maxsize=200mb,
+	FileGrowth=5mb
+	) to filegroup BusShift2013Group
+
+Go 
+Alter Database BusShiftPartition
+Add Filegroup BusShift2014Group
+go
+Alter Database BusShiftPartition
+Add File
+(
+	name='BusShift2014',
+	filename='C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\BusShift2014File.ndf',
+	maxsize=200mb,
+	FileGrowth=5mb
+	) to filegroup BusShift2014Group
+
+Go 
+Alter Database BusShiftPartition
+Add Filegroup BusShift2015Group
+go
+Alter Database BusShiftPartition
+Add File
+(
+	name='BusShift2015',
+	filename='C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\BusShift2015File.ndf',
+	maxsize=200mb,
+	FileGrowth=5mb
+	) to filegroup BusShift2015Group
+
+--create partition function
+use BusShiftPartition
+
+
+Create Partition function fx_ShiftDates(Date)
+As range left
+for values('20111231','20121231','20131231')
+
+Create partition Scheme sch_ShiftDates
+As partition fx_ShiftDates
+to
+(BusShift2012Group,
+BusShift2013Group,
+BusShift2014Group,
+BusShift2015Group)
+
+
+CREATE TABLE [dbo].[BusScheduleAssignment](
+	[BusScheduleAssignmentKey] [int] NOT NULL,
+	[BusDriverShiftKey] [int] NULL,
+	[EmployeeKey] [int] NULL,
+	[BusRouteKey] [int] NULL,
+	[BusScheduleAssignmentDate] [date] NOT NULL,
+	[BusKey] [int] NULL
+)on sch_ShiftDates(BusScheduleAssignmentDate)
+
+insert into BusScheduleAssignment (BusScheduleAssignmentKey, BusDriverShiftKey, EmployeeKey, BusRouteKey, BusScheduleAssignmentDate, BusKey)
+select BusScheduleAssignmentKey, BusDriverShiftKey, EmployeeKey, BusRouteKey, BusScheduleAssignmentDate, BusKey from MetroAlt.dbo.BusScheduleAssignment
+
+--query only 2013
+select * from BusScheduleAssignment
+Where $partition.Fx_ShiftDates(BusScheduleAssignmentDate)=3
