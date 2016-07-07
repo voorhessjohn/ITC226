@@ -1,0 +1,47 @@
+Use MetroAlt
+--full backup "WITH INIT"
+BACKUP DATABASE MetroAlt
+TO DISK= 'C:\Backups\MetroAlt.bak'
+WITH INIT
+
+--FIRST INSERT
+INSERT INTO Employee (EmployeeLastName, EmployeeFirstName, EmployeeAddress, EmployeeCity, EmployeeZipCode, EmployeePhone, EmployeeEmail, EmployeeHireDate)
+VALUES ('Simpson', 'Bart', '123 Evergreen Terrace', 'Springfield', '55555', '5555555555', 'bart@gmail.com', '2016-12-01')
+
+--DIFFERENTIAL BACKUP AFTER FIRST INSERT
+BACKUP DATABASE MetroAlt
+TO DISK= 'C:\Backups\MetroAlt.bak'
+WITH DIFFERENTIAL
+
+--SECOND INSERT
+INSERT INTO Employee (EmployeeLastName, EmployeeFirstName, EmployeeAddress, EmployeeCity, EmployeeZipCode, EmployeePhone, EmployeeEmail, EmployeeHireDate)
+VALUES ('Qimpson', 'Qart', '123 Evergreen Terrace', 'Springfield', '55555', '5555555555', 'qart@gmail.com', '2016-12-01')
+
+--LOG BACKUP AFTER SECOND INSERT
+USE MASTER
+
+BACKUP LOG MetroAlt
+TO DISK= 'C:\Backups\MetroAltlog.bak'
+WITH NORECOVERY, NO_TRUNCATE
+
+--RESTORE TO ORIGINAL BACKUP
+RESTORE DATABASE MetroAlt
+FROM DISK= 'C:\Backups\MetroAlt.bak'
+WITH NORECOVERY, file=1
+
+--RESTORE TO SECOND DIFFERENTIAL BACKUP
+RESTORE DATABASE MetroAlt
+FROM DISK= 'C:\Backups\MetroAlt.bak'
+WITH NORECOVERY, file=2
+
+--RESTORE TO THIRD DIFFERENTIAL BACKUP SINCE I ACCIDENTALLY RAN ONE TWICE EARLIER
+RESTORE DATABASE MetroAlt
+FROM DISK= 'C:\Backups\MetroAlt.bak'
+WITH NORECOVERY, file=3
+
+--LOG BACKUP AND FINAL BACKUP
+RESTORE LOG MetroAlt
+FROM DISK= 'C:\Backups\MetroAltlog.bak'
+WITH RECOVERY
+
+--All inserted records exist upon query after restore.
