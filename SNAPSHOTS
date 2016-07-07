@@ -1,0 +1,36 @@
+--SNAPSHOT
+
+CREATE DATABASE MetroAltSnapshot
+ON
+(NAME='MetroAlt', FILENAME='C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\DATA\MetroAlt.ds')
+AS 
+SNAPSHOT OF MetroAlt
+
+
+USE MetroAlt
+INSERT INTO Employee (EmployeeLastName, EmployeeFirstName, EmployeeAddress, EmployeeCity, EmployeeZipCode, EmployeePhone, EmployeeEmail, EmployeeHireDate)
+VALUES ('Blimpson', 'Blart', '123 Evergreen Terrace', 'Springfield', '55555', '5555555555', 'Blart@gmail.com', '2016-12-01')
+
+--The following does not show the record that I've added above
+USE MetroAltSnapshot
+Select * from Employee
+
+--Updating an employee record
+UPDATE Employee
+SET EmployeeLastName='Glimpson' 
+Where EmployeeKey='515'
+
+--The following does not reflect the insert or the update
+USE MetroAltSnapshot
+Select * from Employee
+
+--This query returns both changes that have been made
+USE MetroAlt
+Select * FROM Employee
+
+/*DESCRIPTION OF CRITERION
+The snapshot reflects the makeup of the database at a specific point. Subsequent additions to the database 
+are not apparent in queries to the snapshot. It is a copy of the database at a moment in time. 
+Any changes that are made in the underlying database are not reflected in the snapshot. 
+The 'MetroAltSnapshot' references the original database, so all queries go through the underlying database. 
+It does not actuall ycopy any data unless the underlying data changes*/
