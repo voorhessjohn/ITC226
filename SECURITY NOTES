@@ -1,0 +1,36 @@
+Use Community_Assist
+
+GO
+CREATE SCHEMA DonorSchema
+
+Go
+CREATE PROC DonorSchema.usp_ViewDonations
+@PersonKey int
+AS
+SELECT DonationDate, DonationAmount
+FROM Donation
+WHERE PersonKey=@PersonKey
+
+GO
+CREATE VIEW DonorSchema.vw_GrantType
+AS
+SELECT * FROM GrantType
+
+GO 
+CREATE VIEW DonorSchema.vw_Employees
+AS
+SELECT PersonLastName [Last Name], PersonFirstName [First Name], EmployeeHireDate [HireDate], PositionName [Position]
+FROM Person p
+inner join Employee e
+on p.PersonKey=e.PersonKey
+inner join EmployeePosition ep
+on ep.EmployeeKey=e.EmployeeKey
+inner join Position pos
+on pos.PositionKey=ep.PositionKey
+
+GO
+CREATE ROLE DonorRole
+
+GRANT EXEC, SELECT on SCHEMA::DonorSchema to DonorRole
+
+ALTER ROLE DonorRole ADD member DonorLogin
