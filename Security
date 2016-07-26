@@ -1,0 +1,79 @@
+Use MetroAlt
+
+GO
+CREATE SCHEMA MaintenanceSchema
+
+GO
+CREATE SCHEMA DriverSchema
+
+GO
+CREATE SCHEMA ManagementSchema
+
+GO
+CREATE SCHEMA AdministrationSchema
+
+GO
+CREATE ROLE MechanicRole
+GRANT EXEC, SELECT on SCHEMA::MaintenanceSchema to MechanicRole
+
+GO
+CREATE ROLE MaintenanceEngineerRole
+GRANT EXEC, SELECT on SCHEMA::MaintenanceSchema to MaintenanceEngineerRole
+
+GO
+CREATE ROLE DetailerRole
+GRANT EXEC, SELECT on SCHEMA::MaintenanceSchema to DetailerRole
+
+GO
+CREATE ROLE DriverRole
+GRANT EXEC, SELECT on SCHEMA::DriverSchema to DriverRole
+
+GO
+CREATE ROLE ManagerRole
+GRANT EXEC, SELECT on SCHEMA::ManagementSchema to ManagerRole
+
+GO
+CREATE ROLE LawyerRole
+GRANT EXEC, SELECT on SCHEMA::AdministrationSchema to LawyerRole
+
+GO
+CREATE ROLE PublicRelationsRole
+GRANT EXEC, SELECT on SCHEMA::AdministrationSchema to PublicRelationsRole
+
+GO
+CREATE ROLE ITRole
+GRANT EXEC, SELECT on SCHEMA::AdministrationSchema to ITRole
+
+GO
+CREATE ROLE AccountantRole
+GRANT EXEC, SELECT on SCHEMA::AdministrationSchema to AccountantRole
+
+GO
+CREATE ROLE DispatcherRole
+GRANT EXEC, SELECT on SCHEMA::AdministrationSchema to DispatcherRole
+
+
+--CREATE NEW USER AND LOGIN
+
+
+CREATE LOGIN ManagerLogin1 WITH PASSWORD='P@ssw0rd1',
+default_database = MetroAlt
+
+use MetroAlt
+ALTER ROLE ManagerRole ADD member Manager1
+
+GO
+CREATE USER Manager1 for login ManagerLogin1 with default_schema=MetroAlt
+
+
+
+
+
+
+
+
+
+
+
+
+ 
