@@ -1,0 +1,62 @@
+Alter database Community_Assist
+Add FileGroup FullTextGroup
+
+Create FullText Catalog ClientNeedDescriptions
+on Filegroup FullTextGroup
+
+Create FullText index on GrantRequest(GrantRequestExplanation)
+Key Index [PK__GrantReq__75A91ED077F2F5D0]
+on ClientNeedDescriptions
+With Change_tracking auto
+
+Select * from GrantRequest
+
+Select GrantRequestExplanation
+from GrantRequest
+Where FreeText(GrantRequestExplanation,'need')
+
+Select GrantRequestExplanation
+from GrantRequest
+Where Contains(GrantRequestExplanation, ' Formsof (Inflectional, break)')
+
+Select GrantRequestExplanation
+from GrantRequest
+Where Contains(GrantRequestExplanation, ' Formsof (Inflectional, need)')
+
+Select GrantRequestExplanation
+from GrantRequest
+Where FreeText(GrantRequestExplanation,'child*')
+
+Select GrantRequestExplanation
+from GrantRequest
+Where Contains(GrantRequestExplanation, 'near((food, groceries),9)')
+
+Select GrantRequestExplanation
+from GrantRequest
+Where Contains(GrantRequestExplanation, 'food AND children')
+
+Select GrantRequestExplanation
+from GrantRequest
+Where Contains(GrantRequestExplanation, 'school AND children')
+
+Select GrantRequestExplanation
+from GrantRequest
+Where Contains(GrantRequestExplanation, 'need AND food')
+
+Select GrantRequestExplanation
+from GrantRequest
+Where Contains(GrantRequestExplanation, 'rent OR school')
+
+Select GrantRequestExplanation
+from GrantRequest
+Where Contains(GrantRequestExplanation, 'food AND NOT stamps')
+
+
+
+
+
+--Where Contains(TestNotes, ' Formsof (Inflectional, Person)')
+
+Update GrantRequest
+Set GrantRequestExplanation= 'I just got a new job and needed a bus pass'
+where GrantRequestKey = 9
